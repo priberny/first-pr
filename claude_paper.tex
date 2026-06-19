@@ -1,0 +1,145 @@
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{abstract}
+\usepackage{titlesec}
+\usepackage{microtype}
+
+\geometry{
+  top=2cm, bottom=2cm,
+  left=1.8cm, right=1.8cm,
+  columnsep=0.6cm
+}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\title{\textbf{Claude: Architecture, Alignment, and Capabilities of a Constitutional AI System}}
+
+\author{
+  Survey Paper\\[0.3em]
+  \small Department of Artificial Intelligence Research\\
+  \small \texttt{priberny@gmx.net}
+}
+
+\date{June 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Claude is a family of large language models (LLMs) developed by Anthropic, designed with a particular emphasis on safety, helpfulness, and honesty. This paper surveys the key architectural decisions, training methodologies, and alignment techniques underlying the Claude model series. We examine Constitutional AI (CAI) as the central alignment framework, discuss the scaling trajectory from Claude~1 through Claude~4, and analyze the emergent capabilities observed across model generations. Our review highlights how Claude differentiates itself from contemporaneous systems through its explicit value specifications and iterative safety training pipeline.
+\end{abstract}
+
+\section{Introduction}
+
+The rapid advancement of large language models has brought both remarkable capabilities and significant safety concerns to the forefront of AI research~\cite{bommasani2021}. Anthropic, founded in 2021 by former members of OpenAI, developed Claude as a response to these dual imperatives: creating a highly capable conversational AI while simultaneously prioritizing safety and alignment with human values~\cite{anthropic2023model}.
+
+Claude distinguishes itself from competing systems such as GPT-4~\cite{openai2023} and Gemini~\cite{team2023gemini} through its commitment to \textit{Constitutional AI} (CAI), a training methodology that encodes explicit behavioral norms directly into the model training process. Rather than relying solely on reinforcement learning from human feedback (RLHF), CAI introduces a structured set of principles that guide both supervised fine-tuning and preference learning.
+
+This paper is structured as follows. Section~\ref{sec:architecture} describes the architectural foundations of the Claude model family. Section~\ref{sec:cai} details the Constitutional AI methodology. Section~\ref{sec:capabilities} summarizes observed capabilities and benchmarks. Section~\ref{sec:limitations} discusses known limitations, and Section~\ref{sec:conclusion} concludes.
+
+\section{Architecture and Model Family}
+\label{sec:architecture}
+
+The Claude model series follows the standard transformer-based decoder architecture introduced by Vaswani et al.~\cite{vaswani2017}, with modifications tailored to long-context processing and instruction following. While Anthropic has not publicly disclosed exact parameter counts, the Claude family spans a range of scales from lightweight edge-deployable variants (Haiku) to frontier-class models (Opus, Sonnet).
+
+\subsection{Context Window and Memory}
+
+A defining characteristic of Claude models is their extended context window. Claude~2 introduced a 100\,000-token context, enabling processing of entire codebases, legal documents, or scientific manuscripts within a single prompt. Claude~3 and subsequent generations extended this further to 200\,000 tokens, with experimental support for one million tokens in research settings~\cite{anthropic2024claude3}.
+
+\subsection{Multimodality}
+
+Beginning with the Claude~3 series, the models support native vision capabilities, accepting images alongside text. This enables document understanding, chart analysis, and visual reasoning tasks without requiring separate vision encoders at inference time.
+
+\section{Constitutional AI}
+\label{sec:cai}
+
+Constitutional AI is the primary alignment technique distinguishing Claude from other frontier LLMs~\cite{bai2022constitutional}. The method operates in two phases:
+
+\textbf{Phase 1 -- Supervised Learning from Critique:} A set of principles (the ``constitution'') is used to prompt the model to critique and revise its own harmful outputs. This self-critique loop generates revised training data that reflects desired behavioral norms without requiring human annotation of every instance.
+
+\textbf{Phase 2 -- Reinforcement Learning from AI Feedback (RLAIF):} A preference model is trained using the principle-guided critiques as feedback signals, replacing or augmenting the human raters typically used in conventional RLHF. This reduces reliance on costly and inconsistent human feedback at scale.
+
+The constitution itself draws from multiple sources including the UN Declaration of Human Rights, Anthropic's internal guidelines, and domain-specific norms. This explicit normative grounding provides auditability absent from purely reward-based alignment approaches.
+
+\section{Capabilities and Benchmarks}
+\label{sec:capabilities}
+
+Across standard benchmarks, Claude models have demonstrated competitive or state-of-the-art performance. Table~\ref{tab:benchmarks} summarizes results reported for Claude~3 Opus on representative evaluations.
+
+\begin{table}[h]
+\centering
+\caption{Claude~3 Opus benchmark results (selected).}
+\label{tab:benchmarks}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Benchmark} & \textbf{Metric} & \textbf{Score} \\
+\midrule
+MMLU             & 5-shot Acc.   & 86.8\% \\
+HumanEval        & pass@1        & 84.9\% \\
+MATH             & 4-shot Acc.   & 60.1\% \\
+GPQA             & 0-shot Acc.   & 50.4\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Beyond benchmark performance, Claude exhibits notable capabilities in multi-step reasoning, code generation, and long-document summarization. Its instruction-following fidelity has been highlighted as superior to prior generations, attributed to the CAI training pipeline enforcing consistent response norms.
+
+\section{Limitations}
+\label{sec:limitations}
+
+Despite its strengths, Claude exhibits several well-documented limitations. \textit{Hallucination} remains a persistent failure mode; the model occasionally generates plausible but factually incorrect statements, particularly for obscure or time-sensitive information~\cite{ji2023survey}. The extended context window, while beneficial, does not guarantee uniform attention quality across all positions, with performance degradation observed for retrieval tasks requiring information from the middle of long documents~\cite{liu2023lost}.
+
+Furthermore, the constitutional approach introduces its own risks: the choice of principles reflects the values of the constitution's authors and may not generalize across cultures or jurisdictions. Anthropic acknowledges this limitation and actively solicits external feedback on its normative framework.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+Claude represents a significant advance in the alignment of large language models, demonstrating that explicit normative specifications can be integrated directly into the training pipeline without sacrificing competitive capability. The Constitutional AI methodology offers a replicable and auditable alternative to purely feedback-driven alignment. Future work should investigate the cross-cultural robustness of constitutional principles and the scalability of RLAIF as model sizes continue to grow.
+
+\begin{thebibliography}{9}
+
+\bibitem{anthropic2023model}
+Anthropic. (2023). \textit{Model Card and Evaluations for Claude Models}. Technical Report.
+
+\bibitem{anthropic2024claude3}
+Anthropic. (2024). \textit{The Claude 3 Model Family: Opus, Sonnet, Haiku}. Technical Report.
+
+\bibitem{bai2022constitutional}
+Bai, Y., et al. (2022). Constitutional AI: Harmlessness from AI Feedback. \textit{arXiv preprint arXiv:2212.08073}.
+
+\bibitem{bommasani2021}
+Bommasani, R., et al. (2021). On the Opportunities and Risks of Foundation Models. \textit{arXiv preprint arXiv:2108.07258}.
+
+\bibitem{ji2023survey}
+Ji, Z., et al. (2023). Survey of Hallucination in Natural Language Generation. \textit{ACM Computing Surveys}, 55(12), 1--38.
+
+\bibitem{liu2023lost}
+Liu, N. F., et al. (2023). Lost in the Middle: How Language Models Use Long Contexts. \textit{Transactions of the ACL}.
+
+\bibitem{openai2023}
+OpenAI. (2023). \textit{GPT-4 Technical Report}. arXiv:2303.08774.
+
+\bibitem{team2023gemini}
+Google DeepMind. (2023). \textit{Gemini: A Family of Highly Capable Multimodal Models}. arXiv:2312.11805.
+
+\bibitem{vaswani2017}
+Vaswani, A., et al. (2017). Attention Is All You Need. \textit{Advances in Neural Information Processing Systems}, 30.
+
+\end{thebibliography}
+
+\end{document}
