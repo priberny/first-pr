@@ -12,7 +12,7 @@ cd first-pr
 python hello.py
 ```
 
-## Feautres
+## Features
 
 - Prints a greeting to the console
 - Easy to extend
